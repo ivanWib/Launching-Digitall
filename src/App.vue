@@ -1,12 +1,26 @@
 <template>
-  <div class="min-h-screen bg-black text-white">
+  <div class="min-h-screen bg-['1C1C1C'] text-white">
     <!-- Initial Landing -->
     <div
       v-if="currentState === 'initial'"
       class="relative flex flex-col items-center justify-center min-h-screen bg-gradient"
     >
       <!-- Decorative Elements -->
-      <div class="absolute inset-0 bg-overlay"></div>
+      <!-- <div class="absolute inset-0">
+        <div v-for="n in 5" :key="n" :ref="`circle${n}`" class="circle"></div>
+        <div
+          v-for="n in 3"
+          :key="`line-${n}`"
+          :ref="`line${n}`"
+          class="line"
+        ></div>
+        <div
+          v-for="n in 10"
+          :key="`sparkle-${n}`"
+          :ref="`sparkle${n}`"
+          class="sparkle"
+        ></div>
+      </div> -->
 
       <!-- Logo -->
       <img
@@ -27,7 +41,7 @@
         </p>
         <button
           @click="startSequence"
-          class="w-80 h-80 bg-accent text-white text-lg font-semibold rounded-full shadow-lg hover:bg-accent-dark transition-transform transform hover:scale-110"
+          class="w-80 h-80 bg-accent text-white text-3xl font-bold rounded-full shadow-lg hover:bg-accent-dark transition-transform transform hover:scale-110"
         >
           Launch Application
         </button>
@@ -39,7 +53,12 @@
       v-if="currentState === 'loading'"
       class="min-h-screen flex flex-col items-center justify-center bg-black"
     >
-      <div class="w-64 h-2 bg-gray-700 rounded-full overflow-hidden">
+      <!-- Large Text -->
+      <div class="text-white text-7xl font-bold mb-6">
+        Tagihan Sudah Tervalidasi
+      </div>
+
+      <div class="w-96 h-2 bg-gray-700 rounded-full overflow-hidden">
         <div
           class="h-full bg-accent transition-all duration-300"
           :style="{ width: `${loadingProgress}%` }"
@@ -57,7 +76,13 @@
         'opacity-100 scale-100': !videoHidden,
       }"
     >
-      <video class="video-element" autoplay playsinline @ended="onVideoEnd">
+      <video
+        class="video-element"
+        autoplay
+        playsinline
+        @ended="onVideoEnd"
+        preload="auto"
+      >
         <source src="@/assets/SitangguhVideo.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
@@ -86,7 +111,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { gsap } from "gsap";
 
 // Audio files
@@ -100,22 +125,16 @@ const completeAudio = new Audio(completeAudioFile);
 
 const currentState = ref("initial");
 const loadingProgress = ref(0);
-const videoHidden = ref(false); // For controlling video transitions
+const videoHidden = ref(false);
 
 const startSequence = async () => {
-  // Play click sound
   clickAudio.play();
-
-  // Delay before transitioning to loading state
   await new Promise((resolve) => setTimeout(resolve, 500));
 
   currentState.value = "loading";
-
-  // Play loading sound
   loadingAudio.loop = false;
   loadingAudio.play();
 
-  // Simulate loading animation
   await new Promise((resolve) => {
     gsap.to(loadingProgress, {
       value: 100,
@@ -130,30 +149,54 @@ const startSequence = async () => {
     });
   });
 
-  // Stop loading sound
   loadingAudio.pause();
   loadingAudio.currentTime = 0;
 
-  // Transition to video after loading
   currentState.value = "video";
 };
 
-// Handle video end event with exit transition
 const onVideoEnd = async () => {
-  videoHidden.value = true; // Start fade-out transition
-
-  // Play complete sound
+  videoHidden.value = true;
   completeAudio.play();
-
-  await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait for fade-out to complete
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   currentState.value = "complete";
 };
+
+// Animasi lingkaran dengan GSAP
+const animateCircles = () => {
+  const circles = Array.from({ length: 20 }, (_, i) =>
+    document.querySelector(`.circle:nth-child(${i + 1})`)
+  );
+
+  circles.forEach((circle, index) => {
+    const tl = gsap.timeline({ repeat: -1, yoyo: true });
+    tl.to(circle, {
+      x: gsap.utils.random(-200, 200),
+      y: gsap.utils.random(-200, 200),
+      scale: gsap.utils.random(0.5, 1.5),
+      duration: gsap.utils.random(3, 6),
+      background: `radial-gradient(circle, ${gsap.utils.random([
+        "#ff007f",
+        "#007bff",
+        "#00ff7f",
+        "#ff7700",
+      ])}, #000)`,
+      ease: "sine.inOut",
+    });
+  });
+};
+
+onMounted(() => {
+  if (currentState.value === "initial") {
+    animateCircles();
+  }
+});
 </script>
 
 <style scoped>
 /* General Styling */
 .bg-black {
-  background-color: #000000;
+  background-color: #0a0a0a;
 }
 
 .text-primary {
@@ -174,7 +217,7 @@ const onVideoEnd = async () => {
 
 /* Decorative Elements */
 .bg-gradient {
-  background: linear-gradient(to bottom, #000000, #1a1a1a);
+  background: linear-gradient(to bottom, #0a0a0a, #1a1a1a);
 }
 
 .bg-overlay {
@@ -212,5 +255,40 @@ const onVideoEnd = async () => {
 /* Button Styling */
 button {
   text-align: center;
+}
+
+/* Lingkaran */
+.circle {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  opacity: 0.7;
+  filter: blur(10px);
+  background: radial-gradient(circle, #ff007f, #007bff);
+  z-index: 0;
+}
+
+/* Garis */
+.line {
+  position: absolute;
+  width: 4px;
+  height: 300px;
+  background: linear-gradient(to bottom, #ff7700, transparent);
+  opacity: 0.8;
+  transform-origin: top;
+  z-index: 0;
+}
+
+/* Percikan */
+.sparkle {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff, transparent);
+  opacity: 0.9;
+  filter: blur(5px);
+  z-index: 0;
 }
 </style>
