@@ -41,7 +41,7 @@
         </p>
         <button
           @click="startSequence"
-          class="w-80 h-80 bg-accent text-white text-3xl font-bold rounded-full shadow-lg hover:bg-accent-dark transition-transform transform hover:scale-110"
+          class="w-72 h-72 mb-5 bg-accent text-white text-3xl font-bold text-center rounded-full shadow-lg hover:bg-accent-dark transition-transform transform hover:scale-110"
         >
           Launch Application
         </button>
@@ -54,7 +54,7 @@
       class="min-h-screen flex flex-col items-center justify-center bg-black"
     >
       <!-- Large Text -->
-      <div class="text-white text-7xl font-bold mb-6">
+      <div class="text-white text-7xl font-bold text-center mb-6">
         Tagihan Sudah Tervalidasi
       </div>
 
